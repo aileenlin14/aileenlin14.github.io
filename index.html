@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小婷的日常分享</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            border-bottom: 1px solid #dbdbdb;
+            background: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Instagram';
+            font-size: 24px;
+            background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 个人资料区 */
+        .profile {
+            max-width: 935px;
+            margin: 100px auto 30px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid #e1306c;
+            padding: 3px;
+            margin-right: 50px;
+        }
+
+        .profile-info {
+            flex-grow: 1;
+        }
+
+        .stats {
+            display: flex;
+            margin: 20px 0;
+        }
+
+        .stat {
+            margin-right: 40px;
+        }
+
+        /* 帖子网格 */
+        .posts-grid {
+            max-width: 935px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .post-thumbnail {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 200;
+        }
+
+        .modal-content {
+            position: relative;
+            background: white;
+            width: 80%;
+            max-width: 1000px;
+            margin: 50px auto;
+            display: flex;
+            border-radius: 5px;
+        }
+
+        .modal-image {
+            flex: 1;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .modal-info {
+            flex: 0 0 350px;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+
+        .editable {
+            border: 1px solid #ddd;
+            padding: 8px;
+            margin: 10px 0;
+            min-height: 100px;
+        }
+
+        .save-btn {
+            background: #3897f0;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">Instagram</div>
+        <div class="icons">
+            <i class="fas fa-home"></i>
+            <i class="fas fa-paper-plane"></i>
+            <i class="fas fa-plus-square"></i>
+            <i class="fas fa-user"></i>
+        </div>
+    </nav>
+
+    <!-- 个人资料 -->
+    <div class="profile">
+        < img src="https://raw.githubusercontent.com/aileenlin14/aileenlin14.github.io/refs/heads/main/AB444F49F328677D3EB8DCB9FDE98410.jpg">
+        <div class="profile-info">
+            <h2>陳小婷 🦋</h2>
+            <div class="stats">
+                <div class="stat"><strong>25</strong> 帖子</div>
+                <div class="stat"><strong>1.2k</strong> 粉絲</div>
+                <div class="stat"><strong>850</strong> 追蹤中</div>
+            </div>
+            <p>🏫 台北市立第一女子高級中學 🌸<br>
+                📚 每天都要進步一點點 ✨<br>
+                ☕️ 奶茶控 | 📸 攝影新手</p >
+        </div>
+    </div>
+
+    <!-- 帖子网格 -->
+    <div class="posts-grid">
+        <div class="post" onclick="openPost(1)">
+            < img src="https://picsum.photos/300/300?random=1" class="post-thumbnail">
+        </div>
+        <!-- 更多帖子... -->
+    </div>
+
+    <!-- 帖子模态框 -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            < img id="modalImg" class="modal-image">
+            <div class="modal-info">
+                <h3 id="postTitle"></h3>
+                <div id="postContent" class="editable" contenteditable="true"></div>
+                <button onclick="savePost()" class="save-btn">保存修改</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 打开帖子模态框
+        function openPost(postId) {
+            const modal = document.getElementById('postModal');
+            const postContent = document.getElementById('postContent');
+  // 示例内容（实际应从数据库获取）
+            const posts = {
+                1: {
+                    title: "周末咖啡廳讀書 📖",
+                    content: "找到一家超有氣氛的咖啡廳！\n拿鐵好好喝～\n#讀書日常 #咖啡廳探店"
+                }
+            };
+
+            document.getElementById('modalImg').src = `https://picsum.photos/800/800?random=${postId}`;
+            document.getElementById('postTitle').textContent = posts[postId].title;
+            postContent.textContent = posts[postId].content;
+            modal.style.display = 'block';
+        }
+
+        // 保存修改
+        function savePost() {
+            const newContent = document.getElementById('postContent').innerText;
+            // 这里可以添加保存到数据库的代码
+            alert('修改已保存！');
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('postModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+```
