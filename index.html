@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>台灣高中生IG主頁</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 台灣學生風格配色 */
+        :root {
+            --main-pink: #FFB3D9;
+            --school-blue: #6EC4E0;
+            --text-dark: #4A4A4A;
+        }
+
+        body {
+            background: #f8f9fa;
+            font-family: "微軟正黑體", "Microsoft JhengHei", sans-serif;
+        }
+
+        /* 大頭貼裝飾 */
+        .avatar-frame {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin-right: 50px;
+        }
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid var(--main-pink);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .school-badge {
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            width: 40px;
+            height: 40px;
+            background: var(--school-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        /* 可編輯區域 */
+        .editable {
+            border-bottom: 2px dashed var(--school-blue);
+            cursor: text;
+        }
+        .edit-btn {
+            background: var(--main-pink);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+        }
+
+        /* 貼文編輯彈窗 */
+        .edit-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- 個人資料區 -->
+    <div class="container" style="width: 800px; margin: 50px auto; background: white; padding: 40px; border-radius: 15px;">
+        <div class="profile-header" style="display: flex;">
+            <div class="avatar-frame">
+                < img src="https://i.pinimg.com/564x/14/8c/5c/148c5c8f9c1b2b9a6d9f7b8e9e0f7b9a.jpg" class="avatar">
+                <div class="school-badge">🏫</div>
+            </div>
+            
+            <div class="profile-info">
+                <h1 style="color: var(--text-dark); margin-bottom: 15px;">
+                    <span class="editable" contenteditable="true">台北小葵🌻</span>
+                    <i class="fas fa-certificate" style="color: var(--school-blue); margin-left: 10px;"></i>
+                </h1>
+                <div style="margin-bottom: 20px;">
+                    <span style="margin-right: 25px;"><strong>1.2k</strong> 粉絲</span>
+                    <span style="margin-right: 25px;"><strong>368</strong> 追蹤</span>
+                    <span><strong>45</strong> 貼文</span>
+                </div>
+                <p class="editable" contenteditable="true" style="color: var(--text-dark);">
+                    📍台北市立明倫高中｜三年二班<br>
+                    🎨美術社社長｜📸攝影愛好者<br>
+                    🥤迷客夏珍珠鮮奶｜🐱三花貓奴
+                </p >
+                <button class="edit-btn"><i class="fas fa-pencil-alt"></i> 編輯檔案</button>
+            </div>
+        </div>
+
+        <!-- 可編輯貼文區 -->
+        <div class="post-grid" style="margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+            <!-- 貼文範例1 -->
+            <div class="post" onclick="openEdit(1)" style="position: relative; cursor: pointer;">
+                < img src="https://i.pinimg.com/564x/25/9b/ae/259bae4a8c2fbfa3a9d1a4c9b4d4f4d4.jpg" style="width: 100%; height: 250px; object-fit: cover; border-radius: 10px;">
+                <div class="post-caption" style="position: absolute; bottom: 0; background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.5)); color: white; padding: 15px; width: 100%; border-radius: 0 0 10px 10px;">
+                    <div id="post1-title" style="font-weight: bold;">美術課作品🎨</div>
+                    <div id="post1-desc" style="font-size: 0.9em;">水彩畫初嘗試！</div>
+                </div>
+            </div>
+
+            <!-- 更多貼文... -->
+        </div>
+    </div>
+
+    <!-- 編輯彈窗 -->
+    <div id="editModal" class="edit-modal">
+        <h3 style="color: var(--text-dark); margin-bottom: 20px;">編輯貼文 <i class="fas fa-pencil-alt"></i></h3>
+        <input type="text" id="editTitle" style="width: 300px; margin-bottom: 15px; padding: 8px;" placeholder="貼文標題">
+        <textarea id="editDesc" style="width: 300px; height: 100px; padding: 8px;" placeholder="貼文描述"></textarea>
+        <div style="margin-top: 20px; text-align: right;">
+            <button onclick="saveEdit()" class="edit-btn">保存修改</button>
+            <button onclick="closeEdit()" style="background: #ddd; margin-left: 10px;">取消</button>
+        </div>
+    </div>
+
+    <script>
+        let editingPost = null;
+
+        function openEdit(postNumber) {
+            editingPost = postNumber;
+            document.getElementById('editModal').style.display = 'block';
+            // 載入現有內容
+            document.getElementById('editTitle').value = document.getElementById(`post${postNumber}-title`).innerText;
+            document.getElementById('editDesc').value = document.getElementById(`post${postNumber}-desc`).innerText;
+        }
+
+        function saveEdit() {
+            if(editingPost) {
+                document.getElementById(`post${editingPost}-title`).innerText = document.getElementById('editTitle').value;
+                document.getElementById(`post${editingPost}-desc`).innerText = document.getElementById('editDesc').value;
+                closeEdit();
+            }
+        }
+
+        function closeEdit() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
